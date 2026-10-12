@@ -8,7 +8,7 @@ const Body = z.object({
   interests: tagList,
   freeText: z.string().max(1000).default(""),
   style,
-  stops: z.array(z.object({ id: z.string().max(64), reason: z.string().max(500) })).max(40),
+  stops: z.array(z.object({ id: z.string().max(64), reason: z.string().max(500) })).max(150),
   mode,
   language,
 });

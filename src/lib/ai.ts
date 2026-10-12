@@ -102,27 +102,58 @@ export async function interpretInterests(text: string, wantLive: boolean, lang: 
 
 const ReasonsSchema = z.object({ reasons: z.array(z.object({ id: z.string(), reason: z.string().max(240) })).max(80) });
 
+/** Compact record for the reasons prompt: enough to ground one sentence, small enough to batch many stops. */
+function reasonRecord(o: MuseumObject) {
+  return {
+    id: o.id,
+    title: o.title,
+    date: o.date,
+    culture: o.culture,
+    room: o.display.roomId ? ROOMS[o.display.roomId].name : null,
+    summary: o.summary,
+    facts: o.facts.slice(0, 2).map((f) => f.text),
+  };
+}
+
+const REASON_BATCH = 8;
+
 export async function explainRecommendations(
   input: { interests: TagId[]; freeText: string; style: GuideStyle; stops: { id: string; reason: string }[] },
   wantLive: boolean,
   lang: Lang = "en",
-): Promise<{ reasons: Record<string, string> } & Meta> {
+): Promise<{ reasons: Record<string, string>; liveIds: string[] } & Meta> {
   const fallback = Object.fromEntries(input.stops.map((s) => [s.id, s.reason]));
-  if (!wantLive || !getProvider()) return { reasons: fallback, source: "demo" };
-  try {
-    const stops = input.stops.filter((s) => OBJECTS_BY_ID[s.id]).map((s) => ({ ...sourceRecord(OBJECTS_BY_ID[s.id]), planner_reason: s.reason }));
-    const out = await callJson(
-      `${GROUNDING}\nTask: for each stop write one sentence (max 30 words) telling this visitor why it was picked for them. Base it on planner_reason and SOURCE facts. Style: ${STYLE_GUIDE[input.style]} Return {"reasons":[{"id","reason"}]} using exactly the given ids.${inLang(lang)}`,
-      `VISITOR: ${JSON.stringify({ interests: input.interests, note: input.freeText.slice(0, 300) })}\nSOURCE: ${JSON.stringify(stops)}`,
-      ReasonsSchema,
-      1200,
+  if (!wantLive || !getProvider()) return { reasons: fallback, liveIds: [], source: "demo" };
+  const stops = input.stops.filter((s) => OBJECTS_BY_ID[s.id]).map((s) => ({ ...reasonRecord(OBJECTS_BY_ID[s.id]), planner_reason: s.reason }));
+  // Long itineraries are split into small batches so each reply stays well inside the output-token limit.
+  const batches: (typeof stops)[] = [];
+  for (let i = 0; i < stops.length; i += REASON_BATCH) batches.push(stops.slice(i, i + REASON_BATCH));
+  const system = `${GROUNDING}\nTask: for each stop write one sentence (max 30 words) telling this visitor why it was picked for them. Base it on planner_reason and SOURCE facts. Style: ${STYLE_GUIDE[input.style]} Return {"reasons":[{"id","reason"}]} using exactly the given ids.${inLang(lang)}`;
+  const visitor = JSON.stringify({ interests: input.interests, note: input.freeText.slice(0, 300) });
+  const reasons = { ...fallback };
+  const liveIds: string[] = [];
+  let lastError: unknown = null;
+  // A few requests in flight at once: fast enough for long tours, gentle on rate limits.
+  for (let i = 0; i < batches.length; i += 5) {
+    const results = await Promise.allSettled(
+      batches.slice(i, i + 5).map((b) =>
+        callJson(system, `VISITOR: ${visitor}\nSOURCE: ${JSON.stringify(b)}`, ReasonsSchema, 120 * b.length + 200),
+      ),
     );
-    const reasons = { ...fallback };
-    for (const r of out.reasons) if (r.id in fallback && r.reason.trim()) reasons[r.id] = r.reason.trim();
-    return { reasons, source: "live" };
-  } catch (e) {
-    return { reasons: fallback, source: "fallback", notice: failNotice(e) };
+    for (const r of results) {
+      if (r.status === "rejected") {
+        lastError = r.reason;
+        continue;
+      }
+      for (const x of r.value.reasons)
+        if (x.id in fallback && x.reason.trim()) {
+          reasons[x.id] = x.reason.trim();
+          liveIds.push(x.id);
+        }
+    }
   }
+  if (!liveIds.length) return { reasons: fallback, liveIds: [], source: "fallback", notice: failNotice(lastError) };
+  return { reasons, liveIds, source: "live" };
 }
 
 // ───────────────────────── tailored explanation ─────────────────────────

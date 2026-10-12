@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { OBJECTS_BY_ID } from "@/data/objects";
-import { answerQuestion, explainObject, interpretInterests } from "@/lib/ai";
+import { answerQuestion, explainObject, explainRecommendations, interpretInterests } from "@/lib/ai";
+import { ON_DISPLAY } from "@/data/objects";
 import { answerDemo, detectFeedback, explainDemo, interpretInterestsDemo } from "@/lib/demo";
 import { POST as askRoute } from "@/app/api/ask/route";
 import { POST as explainRoute } from "@/app/api/explain/route";
@@ -86,6 +87,37 @@ describe("live AI path: validation and fallback", () => {
   const modelReturns = (text: string, status = 200) => {
     globalThis.fetch = vi.fn(async () => new Response(JSON.stringify({ content: [{ type: "text", text }] }), { status })) as typeof fetch;
   };
+
+  it("phrases reasons for a long itinerary in small batches", async () => {
+    const stops = ON_DISPLAY.slice(0, 30).map((o) => ({ id: o.id, reason: "Planner reason." }));
+    const fetchMock = vi.fn(async (_u: unknown, init?: RequestInit) => {
+      const body = JSON.parse(String(init?.body));
+      const ids = [...String(body.messages[0].content).matchAll(/"id":"([^"]+)"/g)].map((m) => m[1]);
+      expect(ids.length).toBeLessThanOrEqual(8);
+      const text = JSON.stringify({ reasons: ids.map((id) => ({ id, reason: `Live reason for ${id}.` })) });
+      return new Response(JSON.stringify({ content: [{ type: "text", text }] }));
+    });
+    globalThis.fetch = fetchMock as unknown as typeof fetch;
+    const r = await explainRecommendations({ interests: ["animals"], freeText: "", style: "approachable", stops }, true);
+    expect(r.source).toBe("live");
+    expect(fetchMock).toHaveBeenCalledTimes(4);
+    expect(r.liveIds).toHaveLength(30);
+    expect(r.reasons[stops[29].id]).toMatch(/^Live reason/);
+  });
+
+  it("keeps the live reasons from batches that succeed when another fails", async () => {
+    const stops = ON_DISPLAY.slice(0, 12).map((o) => ({ id: o.id, reason: "Planner reason." }));
+    let n = 0;
+    globalThis.fetch = vi.fn(async (_u: unknown, init?: RequestInit) => {
+      if (n++ === 1) return new Response("{}", { status: 500 });
+      const ids = [...String(JSON.parse(String(init?.body)).messages[0].content).matchAll(/"id":"([^"]+)"/g)].map((m) => m[1]);
+      return new Response(JSON.stringify({ content: [{ type: "text", text: JSON.stringify({ reasons: ids.map((id) => ({ id, reason: "Live." })) }) }] }));
+    }) as unknown as typeof fetch;
+    const r = await explainRecommendations({ interests: [], freeText: "", style: "approachable", stops }, true);
+    expect(r.source).toBe("live");
+    expect(r.liveIds).toHaveLength(8);
+    expect(r.reasons[stops[11].id]).toBe("Planner reason.");
+  });
 
   it("uses valid model output and strips unknown ids", async () => {
     modelReturns(JSON.stringify({ tags: ["animals", "dragons"], objectIds: ["Y_EA64391", "FAKE_1", "G_1805-0703-15"], note: "Cats!" }));

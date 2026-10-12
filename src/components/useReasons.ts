@@ -27,20 +27,22 @@ export function useAiReasons() {
     setLoading(true);
     setFailed(false);
     const prefs = state.prefs;
-    postJson<{ reasons: Record<string, string>; source: ResponseSource }>("/api/reasons", {
+    // Many stops are phrased in several batches on the server, so allow extra time.
+    postJson<{ reasons: Record<string, string>; liveIds?: string[]; source: ResponseSource }>("/api/reasons", {
       interests: [...prefs.interests, ...prefs.derivedTags],
       freeText: prefs.freeText,
       style: prefs.style,
       stops: stale.map((s) => ({ id: s.objectId, reason: s.reason })),
       mode: "live",
       language: lang,
-    })
+    }, 90000)
       .then((r) => {
         if (r.source !== "live") setFailed(true);
         update((s) => {
           const reasons = { ...s.reasons };
+          const live = new Set(r.liveIds ?? (r.source === "live" ? Object.keys(r.reasons) : []));
           for (const st of stale)
-            if (r.source === "live") reasons[st.objectId] = { text: r.reasons[st.objectId] ?? st.reason, source: r.source, base: st.reason, lang };
+            if (live.has(st.objectId)) reasons[st.objectId] = { text: r.reasons[st.objectId], source: "live", base: st.reason, lang };
           return { ...s, reasons };
         });
       })
