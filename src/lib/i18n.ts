@@ -20,6 +20,8 @@ export function langName(l: Lang): string {
 type Dict = Record<string, string>;
 
 const en: Dict = {
+  "g.liveFailed": "Live AI took too long, so this is the demo explanation.",
+  "warn.underfilled": "Your plan uses about {total} of your {budget} min — that's everything in this guide that can be fitted in. Enjoy the extra {spare} min exploring.",
   "home.aria": "Museum Companion — front page",
   "home.kicker": "British Museum · ground floor",
   "home.tagline": "Your personal guide to the British Museum: a route that fits your time and interests, explained the way you like.",
@@ -227,7 +229,7 @@ const en: Dict = {
   "g.notOnDisplay": "Not on display",
   "g.record": "Record: “{loc}” · checked {date}",
   "g.guide": "Your guide",
-  "g.loadingLive": "Live AI is tailoring the explanation…",
+  "g.loadingLive": "Live AI is writing a tailored version…",
   "g.loading": "Preparing the explanation…",
   "g.expError": "Couldn't load the explanation. Check your connection and try again.",
   "g.more": "👍 More like this",
@@ -370,6 +372,8 @@ const en: Dict = {
 };
 
 const zh: Dict = {
+  "g.liveFailed": "AI 响应超时，这里显示的是演示讲解。",
+  "warn.underfilled": "行程约需 {total} 分钟（共 {budget} 分钟）——本导览中能安排的展品都已包含。剩余的 {spare} 分钟可以自由探索。",
   "home.aria": "博物馆导览伴侣 — 首页",
   "home.kicker": "大英博物馆 · 一层",
   "home.tagline": "你的大英博物馆私人导览：按你的时间和兴趣规划路线，用你喜欢的方式讲解。",
@@ -720,6 +724,8 @@ const zh: Dict = {
 };
 
 const es: Dict = {
+  "g.liveFailed": "La IA tardó demasiado; esta es la explicación de demo.",
+  "warn.underfilled": "Tu plan usa unos {total} de tus {budget} min: es todo lo que esta guía puede incluir. Disfruta de los {spare} min extra explorando.",
   "home.aria": "Museum Companion — portada",
   "home.kicker": "British Museum · planta baja",
   "home.tagline": "Tu guía personal del British Museum: una ruta a la medida de tu tiempo e intereses, explicada como prefieras.",
@@ -1070,6 +1076,8 @@ const es: Dict = {
 };
 
 const fr: Dict = {
+  "g.liveFailed": "L’IA a mis trop de temps ; voici l’explication de démo.",
+  "warn.underfilled": "Votre plan utilise environ {total} de vos {budget} min : c’est tout ce que ce guide peut inclure. Profitez des {spare} min restantes pour explorer.",
   "home.aria": "Museum Companion — accueil",
   "home.kicker": "British Museum · rez-de-chaussée",
   "home.tagline": "Votre guide personnel du British Museum : un parcours adapté à votre temps et à vos goûts, expliqué comme vous l’aimez.",

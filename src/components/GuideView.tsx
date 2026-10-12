@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { OBJECTS_BY_ID } from "@/data/objects";
 import { ROOMS } from "@/data/rooms";
-import type { SuggestedAction } from "@/lib/demo";
+import { explainDemo, type SuggestedAction } from "@/lib/demo";
 import { detailLabel, LANGS, styleLabel, tagList, type Lang } from "@/lib/i18n";
 import { postJson, useVisit } from "@/lib/store";
 import type { DetailLevel, GuideStyle, TagId } from "@/lib/types";
@@ -89,6 +89,7 @@ export function GuideView({ id }: { id: string }) {
   const router = useRouter();
   const [exp, setExp] = useState<Explanation | null>(null);
   const [expError, setExpError] = useState(false);
+  const [pending, setPending] = useState(false);
   const [question, setQuestion] = useState("");
   const [asking, setAsking] = useState(false);
   const [askError, setAskError] = useState(false);
@@ -118,15 +119,25 @@ export function GuideView({ id }: { id: string }) {
       return;
     }
     let cancelled = false;
-    setExp(null);
     setExpError(false);
+    // Show the instant demo text first; in live mode the AI version replaces it when it arrives.
+    const demo = explainDemo(o, style, detail, interests);
+    if (state.aiMode === "live") {
+      setExp({ text: demo.text, source: "demo" });
+      setPending(true);
+    } else setExp(null);
     postJson<{ text: string; source: ResponseSource; notice?: string }>("/api/explain", { objectId: id, style, detail, interests, mode: state.aiMode, language: lang })
       .then((r) => {
         const e = { text: r.text, source: r.source, notice: r.notice };
-        explanationCache.set(key, e);
+        if (r.source === "live" || state.aiMode !== "live") explanationCache.set(key, e);
         if (!cancelled) setExp(e);
       })
-      .catch(() => !cancelled && setExpError(true));
+      .catch(() => {
+        if (cancelled) return;
+        if (state.aiMode === "live") setExp({ text: demo.text, source: "fallback", notice: t("g.liveFailed") });
+        else setExpError(true);
+      })
+      .finally(() => !cancelled && setPending(false));
     return () => {
       cancelled = true;
     };
@@ -277,7 +288,7 @@ export function GuideView({ id }: { id: string }) {
             <>
               <p className="whitespace-pre-line text-[16px] leading-relaxed">{exp.text}</p>
               <div className="mt-2">
-                <SourceTag source={exp.source} notice={exp.notice} />
+                {pending ? <Spinner label={t("g.loadingLive")} /> : <SourceTag source={exp.source} notice={exp.notice} />}
               </div>
             </>
           ) : expError ? (

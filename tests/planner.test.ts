@@ -40,6 +40,22 @@ describe("timing and budget", () => {
     }
   }
 
+  it("fills a long visit even when few objects match the chosen themes", () => {
+    for (const interests of [[], ["world"], ["women"]] as const) {
+      for (const visitStart of ["2026-10-13T10:00", "2026-10-13T11:30"]) {
+        const p = planTour({ prefs: prefs({ minutes: 120, interests: [...interests], visitStart }) });
+        expect(p.totalMinutes).toBeGreaterThanOrEqual(105);
+        expect(p.totalMinutes).toBeLessThanOrEqual(120);
+      }
+    }
+  });
+
+  it("explains when the guide runs out of objects before the time budget", () => {
+    const p = planTour({ prefs: prefs({ minutes: 300, interests: ["egypt"] }) });
+    expect(p.stops).toHaveLength(30);
+    expect(p.notes.some((n) => n.k === "warn.underfilled")).toBe(true);
+  });
+
   it("uses more of a bigger budget", () => {
     const short = planTour({ prefs: prefs({ minutes: 30, interests: ["animals"] }) });
     const long = planTour({ prefs: prefs({ minutes: 120, interests: ["animals"] }) });

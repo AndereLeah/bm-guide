@@ -105,7 +105,7 @@ export function useVisit(): Ctx {
 }
 
 /** POST JSON helper with error handling. */
-export async function postJson<T>(url: string, body: unknown, timeoutMs = 25000): Promise<T> {
+export async function postJson<T>(url: string, body: unknown, timeoutMs = 60000): Promise<T> {
   const ctrl = new AbortController();
   const t = setTimeout(() => ctrl.abort(), timeoutMs);
   try {

@@ -226,6 +226,14 @@ function finalize(order: string[], ctx: Ctx, notes: Notes, excluded: { objectId:
       { n: hoursBlocked.length, time },
     );
   }
+  const spare = ctx.budget - ev.total;
+  if (stops.length && spare >= 15) {
+    notes.add(
+      `Your plan uses about ${ev.total} of your ${ctx.budget} min — that's everything in this guide that can be fitted in. Enjoy the extra ${spare} min exploring.`,
+      "warn.underfilled",
+      { total: ev.total, budget: ctx.budget, spare },
+    );
+  }
   for (const r of ROOM_IDS) {
     const c = roomClosedOnDate(r, ctx.visit.date);
     if (c.warning) notes.add(c.warning, "warn.partial", { room: ROOMS[r].shortName, text: c.warning });
@@ -344,6 +352,25 @@ export function planTour(input: PlanInput): PlanResult {
   for (const c of ranked) {
     const r = lastReason.get(c.object.id);
     if (r && c.score >= 3 && !order.includes(c.object.id)) excluded.push({ objectId: c.object.id, reason: r });
+  }
+
+  // Use any time that's left: add other on-display objects (not ones the visitor down-rated),
+  // nearest-first via cheapest insertion, so a long visit isn't cut short just because few objects
+  // match the chosen themes.
+  const fillers = candidates
+    .filter((c) => !order.includes(c.object.id) && c.score >= 0)
+    .sort((a, b) => b.score - a.score || a.object.id.localeCompare(b.object.id));
+  for (let pass = 0; pass < 3; pass++) {
+    let inserted = false;
+    for (const c of fillers) {
+      if (order.includes(c.object.id)) continue;
+      const { best } = bestInsertion(order, c.object.id, from, detail, visit);
+      if (best && best.ev.total <= budget) {
+        order = best.order;
+        inserted = true;
+      }
+    }
+    if (!inserted) break;
   }
 
   order = improve(order, from, detail, visit);

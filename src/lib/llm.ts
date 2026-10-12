@@ -96,7 +96,7 @@ function errorFor(status: number, body: string): LLMError {
 
 async function complete(p: Provider, system: string, user: string, maxTokens: number): Promise<string> {
   const ctrl = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(), Number(process.env.LLM_TIMEOUT_MS || (p.kind === "stanford" ? 30000 : 20000)));
+  const timer = setTimeout(() => ctrl.abort(), Number(process.env.LLM_TIMEOUT_MS || (p.kind === "stanford" ? 45000 : 25000)));
   checkDailyLimit();
   usage.calls++;
   daily.requests++;

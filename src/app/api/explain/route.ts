@@ -1,4 +1,4 @@
-export const maxDuration = 30;
+export const maxDuration = 60;
 
 import { z } from "zod";
 import { OBJECTS_BY_ID } from "@/data/objects";
