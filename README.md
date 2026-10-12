@@ -99,7 +99,7 @@ bm-guide/
 │   │   └── api/             Server routes: status, interpret, reasons, explain, ask, recap
 │   ├── components/          UI pieces: AppShell (header/nav), GuideView, GalleryMap, StopCard …
 │   ├── data/
-│   │   ├── objects.ts       34 curated objects (30 on display) with sources and image licences
+│   │   ├── objects.ts       103 curated objects (99 on display) with sources and image licences
 │   │   └── rooms.ts         12 rooms, opening hours, closures, doorway connections
 │   └── lib/
 │       ├── planner.ts       Picks and orders stops within your time budget
@@ -136,7 +136,7 @@ Full details are on the in-app **About** page (`/about`).
 
 ## Limitations
 
-- Small dataset (30 objects, 12 ground-floor spaces); display status and closures can change — re-check before real use.
+- Small dataset (99 plannable objects, 12 ground-floor spaces; none yet in Room 23); display status and closures can change — re-check before real use.
 - No live positioning; times are planned estimates, not a live clock.
 - In Demo mode, object texts are English only.
 - AI answers are restricted to curated facts but can still be imperfect.

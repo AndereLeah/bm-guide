@@ -100,7 +100,7 @@ export async function interpretInterests(text: string, wantLive: boolean, lang: 
 
 // ───────────────────────── recommendation reasons ─────────────────────────
 
-const ReasonsSchema = z.object({ reasons: z.array(z.object({ id: z.string(), reason: z.string().max(240) })).max(30) });
+const ReasonsSchema = z.object({ reasons: z.array(z.object({ id: z.string(), reason: z.string().max(240) })).max(80) });
 
 export async function explainRecommendations(
   input: { interests: TagId[]; freeText: string; style: GuideStyle; stops: { id: string; reason: string }[] },

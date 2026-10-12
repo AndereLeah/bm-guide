@@ -51,8 +51,9 @@ describe("timing and budget", () => {
   });
 
   it("explains when the guide runs out of objects before the time budget", () => {
-    const p = planTour({ prefs: prefs({ minutes: 300, interests: ["egypt"] }) });
-    expect(p.stops).toHaveLength(30);
+    const p = planTour({ prefs: prefs({ minutes: 600, interests: ["egypt"], visitStart: "2026-10-16T10:00" }) });
+    // Nearly everything fits; Rooms 7, 9 and 10 are only open 11.00–15.00, which caps a few stops.
+    expect(p.stops.length).toBeGreaterThanOrEqual(Math.floor(ON_DISPLAY.length * 0.85));
     expect(p.notes.some((n) => n.k === "warn.underfilled")).toBe(true);
   });
 
