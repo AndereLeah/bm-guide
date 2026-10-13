@@ -49,7 +49,7 @@ export default function FrontPage() {
               {inProgress ? t("home.newPlan") : t("home.cta")}
             </Link>
             {inProgress && (
-              <Link href={state.started ? "/tour" : "/itinerary"} className="btn border border-white/70 text-white hover:bg-white/10">
+              <Link href="/tour" className="btn border border-white/70 text-white hover:bg-white/10">
                 {t("home.resume")}
               </Link>
             )}

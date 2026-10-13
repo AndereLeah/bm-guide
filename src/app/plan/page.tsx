@@ -7,14 +7,17 @@ import { Notice, Spinner } from "@/components/ui";
 import { ON_DISPLAY, OBJECTS_BY_ID } from "@/data/objects";
 import { ROOMS } from "@/data/rooms";
 import { postJson, useVisit } from "@/lib/store";
-import { listJoin, styleLabel, tagLabel, type T } from "@/lib/i18n";
+import { hoursText, listJoin, styleLabel, tagLabel, type T } from "@/lib/i18n";
 import { TAGS } from "@/lib/tags";
 import type { GuideStyle, Preferences, RoomId, TagId } from "@/lib/types";
 import { createVisit } from "@/lib/visit";
 
-/** Longest possible visit: a Friday late opening, 10.00 to 20.20. */
-const MAX_MINUTES = 620;
-const TIMES = [30, 45, 60, 90, 120];
+/** Longest visit accepted: 10 hours (a Friday late opening runs 10.00 to 20.20). */
+const MAX_HOURS = 10;
+const MAX_MINUTES = MAX_HOURS * 60;
+const parseHours = (v: string) => parseFloat(v.replace(",", "."));
+/** Quick choices from a short visit to most of a day (minutes; shown in hours). */
+const TIMES = [30, 60, 120, 180, 240, 360];
 const STYLES: GuideStyle[] = ["approachable", "in-depth", "playful", "family"];
 const LOCALE = { en: "en-GB", zh: "zh-CN", es: "es-ES", fr: "fr-FR" } as const;
 const STARTS: RoomId[] = ["GC", "24", "4", "1", "18"];
@@ -183,7 +186,7 @@ export default function WelcomePage() {
     };
     update((s) => createVisit(s, prefs));
     setBusy(false);
-    router.push("/itinerary");
+    router.push("/tour");
   }
 
   if (!hydrated) return <Spinner label={t("common.loading")} />;
@@ -202,14 +205,14 @@ export default function WelcomePage() {
           </h2>
           <p className="mt-1 text-sm text-muted">{t("w.resume", { seen: state.completed.length, togo: state.plan.stops.length })}</p>
           <ul className="mt-2 space-y-0.5 text-sm">
-            <li>{t("w.answerTime", { min: existing.minutes, when: formatStart(existing.visitStart, locale) })}</li>
+            <li>{t("w.answerTime", { time: hoursText(lang, existing.minutes), when: formatStart(existing.visitStart, locale) })}</li>
             <li>{existing.interests.length ? listJoin(lang, existing.interests.map((x) => tagLabel(lang, x))) : t("w.noThemes")}</li>
             {existing.freeText && <li className="text-muted">“{existing.freeText}”</li>}
             <li>{styleLabel(lang, existing.style)}</li>
             {existing.mustSee.length > 0 && <li>{t("w.mustSummary", { list: listJoin(lang, existing.mustSee.map((id) => OBJECTS_BY_ID[id]?.shortTitle ?? id)) })}</li>}
           </ul>
           <div className="mt-3 flex flex-wrap gap-2">
-            <Link href={state.started ? "/tour" : "/itinerary"} className="btn-primary">
+            <Link href="/tour" className="btn-primary">
               {t("w.resumeLink")}
             </Link>
             <button type="button" className="btn-secondary" onClick={startNewChat}>
@@ -239,7 +242,7 @@ export default function WelcomePage() {
             <div role="radiogroup" aria-label={t("w.q1")} className="flex flex-wrap gap-2">
               {TIMES.map((m) => (
                 <button key={m} type="button" role="radio" aria-checked={minutes === m && !customTime} className="chip" onClick={() => (setMinutes(m), setCustomTime(""))}>
-                  {m < 60 ? t("w.min", { n: m }) : m === 60 ? t("w.hour1") : t("w.hours", { n: m / 60 })}
+                  {hoursText(lang, m)}
                 </button>
               ))}
             </div>
@@ -247,22 +250,23 @@ export default function WelcomePage() {
               {t("w.other")}
               <input
                 type="number"
-                inputMode="numeric"
-                min={10}
-                max={MAX_MINUTES}
+                inputMode="decimal"
+                min={0.5}
+                max={MAX_HOURS}
+                step={0.5}
                 value={customTime}
                 onChange={(e) => {
                   setCustomTime(e.target.value);
-                  const n = parseInt(e.target.value, 10);
-                  // Every keystroke updates the plan length, so "420" never gets stuck at "42".
-                  if (n >= 10) setMinutes(Math.min(n, MAX_MINUTES));
+                  const h = parseHours(e.target.value);
+                  // Every keystroke updates the plan length; minimum 15 minutes, maximum 10 hours.
+                  if (h > 0) setMinutes(Math.min(Math.max(15, Math.round(h * 60)), MAX_MINUTES));
                 }}
                 className="min-h-11 w-24 rounded-lg border border-line px-3"
                 aria-label={t("w.customAria")}
               />
               {t("w.minutes")}
             </label>
-            {parseInt(customTime, 10) > MAX_MINUTES && <p className="text-xs text-warn">{t("w.customMax", { max: MAX_MINUTES })}</p>}
+            {parseHours(customTime) > MAX_HOURS && <p className="text-xs text-warn">{t("w.customMax", { max: MAX_HOURS })}</p>}
             <div className="text-sm">
               <span className="text-muted">{t("w.starting")} </span>
               {editStart ? (
@@ -290,7 +294,7 @@ export default function WelcomePage() {
           </div>
         ) : (
           <VisitorBubble t={t} onEdit={() => setStep(0)}>
-            {t("w.answerTime", { min: minutes, when: formatStart(visitStart, locale) })}
+            {t("w.answerTime", { time: hoursText(lang, minutes), when: formatStart(visitStart, locale) })}
           </VisitorBubble>
         )}
 
@@ -425,7 +429,7 @@ export default function WelcomePage() {
         {step === 4 && (
           <>
             <GuideBubble>
-              {t("w.thanks", { min: minutes })}
+              {t("w.thanks", { time: hoursText(lang, minutes) })}
             </GuideBubble>
             <div className="sticky bottom-20 z-10 flex flex-col gap-2 sm:bottom-4">
               <button type="button" className="btn-primary min-h-12 text-base shadow-lg" onClick={plan} disabled={busy}>

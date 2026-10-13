@@ -8,7 +8,6 @@ import { useVisit } from "@/lib/store";
 
 const NAV = [
   { href: "/plan", key: "nav.plan", icon: "M4 6h16M4 12h10M4 18h7" },
-  { href: "/itinerary", key: "nav.itinerary", icon: "M5 4h14v16H5zM9 8h6M9 12h6M9 16h4" },
   { href: "/tour", key: "nav.tour", icon: "M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2zM9 4v14M15 6v14" },
   { href: "/summary", key: "nav.summary", icon: "M5 13l4 4L19 7" },
 ];
@@ -70,7 +69,7 @@ export function LanguageSelect() {
 export function AppShell({ children }: { children: ReactNode }) {
   const path = usePathname();
   const { storageOk, t, lang, state } = useVisit();
-  const active = (href: string) => path.startsWith(href) || (href === "/tour" && path.startsWith("/guide"));
+  const active = (href: string) => path.startsWith(href) || (href === "/tour" && (path.startsWith("/guide") || path.startsWith("/itinerary")));
   return (
     <div className="mx-auto flex min-h-dvh max-w-5xl flex-col">
       <header className="sticky top-0 z-30 border-b border-line bg-paper/95 backdrop-blur">
@@ -124,7 +123,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       </footer>
 
       <nav aria-label="Main" className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-white/95 backdrop-blur sm:hidden">
-        <ul className="grid grid-cols-4">
+        <ul className="grid grid-cols-3">
           {NAV.map((n) => (
             <li key={n.href}>
               <Link

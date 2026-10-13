@@ -12,10 +12,10 @@ Tell it how much time you have and what you're curious about. It plans a walkabl
 
 0. **Front page** – a welcome page with a photo of the Museum; the *Museum Companion* title in the header always returns here.
 1. **Plan** – a short chat asks for your time, interests, guide style and must-see objects.
-2. **Itinerary** – an ordered list of stops with photos, rooms, walking/viewing times and *why each stop suits you*.
+2. **Tour** – one page for the whole visit: before you start, an ordered list of stops with photos, rooms, walking/viewing times and *why each stop suits you*; once started, progress, time left and what changed. Switch between **List** and **Map** (side by side on wide screens).
 3. **Object guide** – a tailored explanation (Approachable · In-depth · Playful · Family), a Listen button, and a chat for questions.
 4. **Adapt** – *More / Less like this*, *More / Less detail*, *Skip*, *Complete*, or change your remaining time — the tour re-plans and tells you what changed.
-5. **Tour & map** – an interactive gallery map with your numbered route; tap a stop or a room.
+5. **Map** – an interactive gallery map with your numbered route; tap a stop or a room.
 6. **Summary** – a recap of what you saw, downloadable.
 
 Also: 4 languages (English, 中文, Español, Français), works on phones, and your visit survives a page refresh.
@@ -91,9 +91,9 @@ bm-guide/
 │   ├── app/                 Pages (Next.js App Router) and API routes
 │   │   ├── page.tsx         Front page
 │   │   ├── plan/            Preferences chat
-│   │   ├── itinerary/       Personalised itinerary
+│   │   ├── itinerary/       Redirects to /tour (old links)
 │   │   ├── guide/[id]/      Object guide + Q&A
-│   │   ├── tour/            Progress, time controls, map
+│   │   ├── tour/            Itinerary + progress, time controls, list/map
 │   │   ├── summary/         Recap + download
 │   │   ├── about/           Sources, permissions, limitations
 │   │   └── api/             Server routes: status, interpret, reasons, explain, ask, recap

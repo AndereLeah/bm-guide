@@ -8,7 +8,6 @@ import { AppShell } from "@/components/AppShell";
 import { GuideView } from "@/components/GuideView";
 import WelcomePage from "@/app/plan/page";
 import FrontPage from "@/app/page";
-import ItineraryPage from "@/app/itinerary/page";
 import TourPage from "@/app/tour/page";
 import SummaryPage from "@/app/summary/page";
 import { OBJECTS_BY_ID } from "@/data/objects";
@@ -73,26 +72,28 @@ describe("full visitor workflow (demo mode, no credentials)", () => {
     snapshot("00-front");
   });
 
-  it("0b. typing a long custom time keeps every digit (420 is not cut to 42)", async () => {
+  it("0b. visit length is chosen in hours, from short to long, and long custom values keep every digit", async () => {
     mount(<WelcomePage />, "/plan");
-    const box = await screen.findByRole("spinbutton", { name: "Custom time in minutes" });
-    for (const v of ["4", "42", "420"]) fireEvent.change(box, { target: { value: v } });
+    const group = await screen.findByRole("radiogroup");
+    expect(within(group).getAllByRole("radio").map((r) => r.textContent)).toEqual(["½ hour", "1 hour", "2 hours", "3 hours", "4 hours", "6 hours"]);
+    const box = screen.getByRole("spinbutton", { name: "Custom time in hours" });
+    for (const v of ["7", "7.", "7.5"]) fireEvent.change(box, { target: { value: v } });
     fireEvent.click(screen.getByRole("button", { name: "Next" }));
-    expect(await screen.findByText(/420 minutes, starting/)).toBeTruthy();
+    expect(await screen.findByText(/7\.5 hours, starting/)).toBeTruthy();
     cleanup();
     mount(<WelcomePage />, "/plan");
-    const box2 = await screen.findByRole("spinbutton", { name: "Custom time in minutes" });
-    fireEvent.change(box2, { target: { value: "900" } });
-    expect(screen.getByText(/Capped at 620 min/)).toBeTruthy();
+    const box2 = await screen.findByRole("spinbutton", { name: "Custom time in hours" });
+    fireEvent.change(box2, { target: { value: "12" } });
+    expect(screen.getByText(/Capped at 10 hours/)).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "Next" }));
-    expect(await screen.findByText(/620 minutes, starting/)).toBeTruthy();
+    expect(await screen.findByText(/10 hours, starting/)).toBeTruthy();
   });
 
   it("1. preferences chat → plan my visit", async () => {
     mount(<WelcomePage />, "/plan");
     expect(await screen.findByText(/how much time do you have/i)).toBeTruthy();
     expect(screen.getByRole("switch").textContent).toMatch(/Demo mode/);
-    fireEvent.click(screen.getByRole("radio", { name: "45 min" }));
+    fireEvent.click(screen.getByRole("radio", { name: "1 hour" }));
     fireEvent.click(screen.getByRole("button", { name: "Next" }));
     // Interests
     fireEvent.click(screen.getByRole("button", { name: "Ancient Egypt" }));
@@ -111,14 +112,14 @@ describe("full visitor workflow (demo mode, no credentials)", () => {
     await act(async () => {
       fireEvent.click(screen.getByRole("button", { name: "Plan my visit" }));
     });
-    await waitFor(() => expect(router.push).toHaveBeenCalledWith("/itinerary"));
+    await waitFor(() => expect(router.push).toHaveBeenCalledWith("/tour"));
     const s = saved();
-    expect(s.prefs!.minutes).toBe(45);
+    expect(s.prefs!.minutes).toBe(60);
     expect(s.prefs!.style).toBe("playful");
     expect(s.prefs!.derivedTags).toEqual(expect.arrayContaining(["animals", "writing"]));
     expect(s.prefs!.derivedObjectIds).toContain("Y_EA64391");
     expect(s.plan!.stops.map((x) => x.objectId)).toContain("G_1816-0610-98");
-    expect(s.plan!.totalMinutes).toBeLessThanOrEqual(45);
+    expect(s.plan!.totalMinutes).toBeLessThanOrEqual(60);
   });
 
   it("1b. re-planning starts a new preferences chat instead of editing old answers", async () => {
@@ -136,7 +137,7 @@ describe("full visitor workflow (demo mode, no credentials)", () => {
     expect(saved().prefs).toEqual(before.prefs);
     // New chat → quick answers → re-plan.
     fireEvent.click(screen.getByRole("button", { name: "Re-plan with a new chat" }));
-    fireEvent.click(screen.getByRole("radio", { name: "45 min" }));
+    fireEvent.click(screen.getByRole("radio", { name: "½ hour" }));
     fireEvent.click(screen.getByRole("button", { name: "Next" }));
     fireEvent.click(screen.getByRole("button", { name: "Ancient Egypt" }));
     fireEvent.click(screen.getByRole("button", { name: "Animals" }));
@@ -150,13 +151,19 @@ describe("full visitor workflow (demo mode, no credentials)", () => {
     await act(async () => {
       fireEvent.click(screen.getByRole("button", { name: "Re-plan my visit" }));
     });
-    await waitFor(() => expect(router.push).toHaveBeenLastCalledWith("/itinerary"));
+    await waitFor(() => expect(router.push).toHaveBeenLastCalledWith("/tour"));
     expect(saved().prefs!.style).toBe("playful");
   });
 
-  it("2. itinerary survives a refresh and downloads the current plan", async () => {
-    mount(<ItineraryPage />, "/itinerary");
+  it("2. tour page before starting: itinerary survives a refresh, list/map switch, download", async () => {
+    mount(<TourPage />, "/tour");
     expect(await screen.findByRole("heading", { name: /personalised itinerary/i })).toBeTruthy();
+    expect(screen.queryByRole("progressbar")).toBeNull(); // progress appears only once the tour starts
+    expect(screen.getByRole("tab", { name: "List" }).getAttribute("aria-selected")).toBe("true");
+    fireEvent.click(screen.getByRole("tab", { name: "Map" }));
+    expect(screen.getByRole("tab", { name: "Map" }).getAttribute("aria-selected")).toBe("true");
+    expect(screen.getByRole("heading", { name: "Gallery map" })).toBeTruthy();
+    fireEvent.click(screen.getByRole("tab", { name: "List" }));
     const list = screen.getByRole("list", { name: "Itinerary stops" });
     const s = saved();
     expect(within(list).getAllByRole("listitem")).toHaveLength(s.plan!.stops.length);
@@ -247,9 +254,9 @@ describe("full visitor workflow (demo mode, no credentials)", () => {
     expect(screen.getAllByText(/More like Royal lion hunt/).length).toBeGreaterThan(0);
   });
 
-  it("5. tour & map: progress, remaining-time changes, room selection opens stops", async () => {
+  it("5. tour page during the visit: progress, remaining-time changes, room selection opens stops", async () => {
     mount(<TourPage />, "/tour");
-    expect(await screen.findByRole("heading", { name: "Tour & map" })).toBeTruthy();
+    expect(await screen.findByRole("heading", { name: "Your tour" })).toBeTruthy();
     expect(screen.getByRole("progressbar")).toBeTruthy();
     const s0 = saved();
     expect(screen.getByText(/Tour updated:/)).toBeTruthy();
@@ -313,7 +320,7 @@ describe("full visitor workflow (demo mode, no credentials)", () => {
     await screen.findByText(/how much time do you have/i);
     fireEvent.change(screen.getByLabelText("Language"), { target: { value: "zh" } });
     expect(await screen.findByText("规划一次适合你的参观")).toBeTruthy();
-    expect(screen.getAllByText("导览与地图").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("导览").length).toBeGreaterThan(0);
     expect(document.documentElement.lang).toBe("zh-CN");
     expect(screen.getByText(/演示模式下展品文字为英文/)).toBeTruthy();
     expect(saved().language).toBe("zh");

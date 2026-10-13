@@ -20,8 +20,13 @@ export function langName(l: Lang): string {
 type Dict = Record<string, string>;
 
 const en: Dict = {
+  "w.halfHour": "½ hour",
+  "tour.viewList": "List",
+  "tour.viewMap": "Map",
+  "tour.viewAria": "Show stops as",
+  "tour.stops": "Your stops",
   "warn.closing": "The galleries clear at {time}, so only about {usable} of your {budget} min can be used from this start time.",
-  "w.customMax": "Capped at {max} min — the longest the Museum is open in a day.",
+  "w.customMax": "Capped at {max} hours — about the longest the Museum is open in a day.",
   "g.liveFailed": "Live AI took too long, so this is the demo explanation.",
   "warn.underfilled": "Your plan uses about {total} of your {budget} min — that's everything in this guide that can be fitted in. Enjoy the extra {spare} min exploring.",
   "home.aria": "Museum Companion — front page",
@@ -54,7 +59,7 @@ const en: Dict = {
   "app.subtitle": "AI guide prototype · British Museum, ground floor",
   "nav.plan": "Plan",
   "nav.itinerary": "Itinerary",
-  "nav.tour": "Tour & map",
+  "nav.tour": "Tour",
   "nav.summary": "Summary",
   "mode.live": "Live AI",
   "mode.demo": "Demo mode",
@@ -81,8 +86,8 @@ const en: Dict = {
   "w.hour1": "1 hour",
   "w.hours": "{n} hours",
   "w.other": "Other:",
-  "w.minutes": "minutes",
-  "w.customAria": "Custom time in minutes",
+  "w.minutes": "hours",
+  "w.customAria": "Custom time in hours",
   "w.starting": "Starting:",
   "w.now": "now",
   "w.london": "(London time)",
@@ -90,7 +95,7 @@ const en: Dict = {
   "w.startAria": "Visit start (London time)",
   "w.startHelp": "Used to check opening hours and planned gallery closures.",
   "w.closedNote": "The galleries are closed right now, so I've assumed the next opening at 10:00.",
-  "w.answerTime": "{min} minutes, starting {when}",
+  "w.answerTime": "{time}, starting {when}",
   "w.q2": "Great. What are you curious about? Pick any themes, and add your own words if you like.",
   "w.interests": "Interests",
   "w.ownWords": "In your own words (optional)",
@@ -111,7 +116,7 @@ const en: Dict = {
   "w.mustSummary": "Must see: {list}",
   "w.noMust": "No must-sees",
   "w.startAt": "start at {room}",
-  "w.thanks": "Thanks! I'll plan about {min} minutes, walking included. You can change anything later.",
+  "w.thanks": "Thanks! I'll plan about {time}, walking included. You can change anything later.",
   "w.plan": "Plan my visit",
   "w.replan": "Re-plan my visit",
   "w.planningBtn": "Planning…",
@@ -285,7 +290,7 @@ const en: Dict = {
   "src.demo": "Demo response · rule-based, no AI",
   "src.fallback": "Demo response · live AI unavailable",
 
-  "t.h1": "Tour & map",
+  "t.h1": "Your tour",
   "t.progress": "{seen} seen · {togo} to go",
   "t.skippedN": " · {n} skipped",
   "t.used": "About {n} min used (planned)",
@@ -374,8 +379,13 @@ const en: Dict = {
 };
 
 const zh: Dict = {
+  "w.halfHour": "半小时",
+  "tour.viewList": "列表",
+  "tour.viewMap": "地图",
+  "tour.viewAria": "站点显示方式",
+  "tour.stops": "你的站点",
   "warn.closing": "展厅在 {time} 清场，按此开始时间，{budget} 分钟中只能用上约 {usable} 分钟。",
-  "w.customMax": "最多 {max} 分钟——博物馆单日最长开放时间。",
+  "w.customMax": "最多 {max} 小时——约为博物馆单日最长开放时间。",
   "g.liveFailed": "AI 响应超时，这里显示的是演示讲解。",
   "warn.underfilled": "行程约需 {total} 分钟（共 {budget} 分钟）——本导览中能安排的展品都已包含。剩余的 {spare} 分钟可以自由探索。",
   "home.aria": "博物馆导览伴侣 — 首页",
@@ -408,7 +418,7 @@ const zh: Dict = {
   "app.subtitle": "AI 导览原型 · 大英博物馆一层",
   "nav.plan": "规划",
   "nav.itinerary": "行程",
-  "nav.tour": "导览与地图",
+  "nav.tour": "导览",
   "nav.summary": "总结",
   "mode.live": "AI 实时",
   "mode.demo": "演示模式",
@@ -435,8 +445,8 @@ const zh: Dict = {
   "w.hour1": "1 小时",
   "w.hours": "{n} 小时",
   "w.other": "其他：",
-  "w.minutes": "分钟",
-  "w.customAria": "自定义时长（分钟）",
+  "w.minutes": "小时",
+  "w.customAria": "自定义时长（小时）",
   "w.starting": "开始时间：",
   "w.now": "现在",
   "w.london": "（伦敦时间）",
@@ -444,7 +454,7 @@ const zh: Dict = {
   "w.startAria": "参观开始时间（伦敦时间）",
   "w.startHelp": "用于核对开放时间和计划中的展厅关闭。",
   "w.closedNote": "展厅现在已关闭，因此默认按下一次 10:00 开馆规划。",
-  "w.answerTime": "{min} 分钟，{when} 开始",
+  "w.answerTime": "{time}，{when} 开始",
   "w.q2": "好的。你对什么感兴趣？选择任意主题，也可以用自己的话补充。",
   "w.interests": "兴趣",
   "w.ownWords": "用自己的话说（可选）",
@@ -465,7 +475,7 @@ const zh: Dict = {
   "w.mustSummary": "必看：{list}",
   "w.noMust": "没有必看展品",
   "w.startAt": "从{room}出发",
-  "w.thanks": "谢谢！我会规划约 {min} 分钟（含步行）。之后随时可以修改。",
+  "w.thanks": "谢谢！我会规划约 {time}（含步行）。之后随时可以修改。",
   "w.plan": "规划我的参观",
   "w.replan": "重新规划",
   "w.planningBtn": "规划中…",
@@ -639,7 +649,7 @@ const zh: Dict = {
   "src.demo": "演示回答 · 规则生成，非 AI",
   "src.fallback": "演示回答 · AI 暂不可用",
 
-  "t.h1": "导览与地图",
+  "t.h1": "你的导览",
   "t.progress": "已看 {seen} · 还剩 {togo}",
   "t.skippedN": " · 跳过 {n}",
   "t.used": "已用约 {n} 分钟（按计划）",
@@ -728,8 +738,13 @@ const zh: Dict = {
 };
 
 const es: Dict = {
+  "w.halfHour": "½ hora",
+  "tour.viewList": "Lista",
+  "tour.viewMap": "Mapa",
+  "tour.viewAria": "Mostrar paradas como",
+  "tour.stops": "Tus paradas",
   "warn.closing": "Las salas se desalojan a las {time}, así que desde esta hora solo se pueden usar unos {usable} de tus {budget} min.",
-  "w.customMax": "Máximo {max} min: el horario más largo del Museo en un día.",
+  "w.customMax": "Máximo {max} horas: aproximadamente el horario más largo del Museo en un día.",
   "g.liveFailed": "La IA tardó demasiado; esta es la explicación de demo.",
   "warn.underfilled": "Tu plan usa unos {total} de tus {budget} min: es todo lo que esta guía puede incluir. Disfruta de los {spare} min extra explorando.",
   "home.aria": "Museum Companion — portada",
@@ -762,7 +777,7 @@ const es: Dict = {
   "app.subtitle": "Prototipo de guía con IA · British Museum, planta baja",
   "nav.plan": "Planificar",
   "nav.itinerary": "Itinerario",
-  "nav.tour": "Visita y mapa",
+  "nav.tour": "Visita",
   "nav.summary": "Resumen",
   "mode.live": "IA en vivo",
   "mode.demo": "Modo demo",
@@ -789,8 +804,8 @@ const es: Dict = {
   "w.hour1": "1 hora",
   "w.hours": "{n} horas",
   "w.other": "Otro:",
-  "w.minutes": "minutos",
-  "w.customAria": "Tiempo personalizado en minutos",
+  "w.minutes": "horas",
+  "w.customAria": "Tiempo personalizado en horas",
   "w.starting": "Inicio:",
   "w.now": "ahora",
   "w.london": "(hora de Londres)",
@@ -798,7 +813,7 @@ const es: Dict = {
   "w.startAria": "Inicio de la visita (hora de Londres)",
   "w.startHelp": "Se usa para comprobar horarios y cierres de salas previstos.",
   "w.closedNote": "Las salas están cerradas ahora, así que he supuesto la próxima apertura a las 10:00.",
-  "w.answerTime": "{min} minutos, desde {when}",
+  "w.answerTime": "{time}, desde {when}",
   "w.q2": "Genial. ¿Qué te da curiosidad? Elige temas y, si quieres, añade tus propias palabras.",
   "w.interests": "Intereses",
   "w.ownWords": "Con tus palabras (opcional)",
@@ -819,7 +834,7 @@ const es: Dict = {
   "w.mustSummary": "Imprescindibles: {list}",
   "w.noMust": "Sin imprescindibles",
   "w.startAt": "salida en {room}",
-  "w.thanks": "¡Gracias! Planificaré unos {min} minutos, incluido el trayecto. Puedes cambiar todo después.",
+  "w.thanks": "¡Gracias! Planificaré unas {time}, incluido el trayecto. Puedes cambiar todo después.",
   "w.plan": "Planificar mi visita",
   "w.replan": "Volver a planificar",
   "w.planningBtn": "Planificando…",
@@ -993,7 +1008,7 @@ const es: Dict = {
   "src.demo": "Respuesta demo · por reglas, sin IA",
   "src.fallback": "Respuesta demo · IA no disponible",
 
-  "t.h1": "Visita y mapa",
+  "t.h1": "Tu visita",
   "t.progress": "{seen} vistos · {togo} pendientes",
   "t.skippedN": " · {n} omitidos",
   "t.used": "Unos {n} min usados (planificados)",
@@ -1082,8 +1097,13 @@ const es: Dict = {
 };
 
 const fr: Dict = {
+  "w.halfHour": "½ heure",
+  "tour.viewList": "Liste",
+  "tour.viewMap": "Plan",
+  "tour.viewAria": "Afficher les arrêts en",
+  "tour.stops": "Vos arrêts",
   "warn.closing": "Les salles sont évacuées à {time} : depuis cette heure de départ, seules environ {usable} de vos {budget} min sont utilisables.",
-  "w.customMax": "Limité à {max} min, la plus longue ouverture du Musée en une journée.",
+  "w.customMax": "Limité à {max} heures, à peu près la plus longue ouverture du Musée en une journée.",
   "g.liveFailed": "L’IA a mis trop de temps ; voici l’explication de démo.",
   "warn.underfilled": "Votre plan utilise environ {total} de vos {budget} min : c’est tout ce que ce guide peut inclure. Profitez des {spare} min restantes pour explorer.",
   "home.aria": "Museum Companion — accueil",
@@ -1116,7 +1136,7 @@ const fr: Dict = {
   "app.subtitle": "Prototype de guide IA · British Museum, rez-de-chaussée",
   "nav.plan": "Préparer",
   "nav.itinerary": "Itinéraire",
-  "nav.tour": "Visite et plan",
+  "nav.tour": "Visite",
   "nav.summary": "Bilan",
   "mode.live": "IA en direct",
   "mode.demo": "Mode démo",
@@ -1143,8 +1163,8 @@ const fr: Dict = {
   "w.hour1": "1 heure",
   "w.hours": "{n} heures",
   "w.other": "Autre :",
-  "w.minutes": "minutes",
-  "w.customAria": "Durée personnalisée en minutes",
+  "w.minutes": "heures",
+  "w.customAria": "Durée personnalisée en heures",
   "w.starting": "Début :",
   "w.now": "maintenant",
   "w.london": "(heure de Londres)",
@@ -1152,7 +1172,7 @@ const fr: Dict = {
   "w.startAria": "Début de la visite (heure de Londres)",
   "w.startHelp": "Sert à vérifier les horaires et les fermetures de salles prévues.",
   "w.closedNote": "Les salles sont fermées actuellement : j'ai supposé la prochaine ouverture à 10:00.",
-  "w.answerTime": "{min} minutes, à partir de {when}",
+  "w.answerTime": "{time}, à partir de {when}",
   "w.q2": "Parfait. Qu'est-ce qui vous intéresse ? Choisissez des thèmes et ajoutez vos propres mots si vous le souhaitez.",
   "w.interests": "Centres d'intérêt",
   "w.ownWords": "Avec vos mots (facultatif)",
@@ -1173,7 +1193,7 @@ const fr: Dict = {
   "w.mustSummary": "À voir absolument : {list}",
   "w.noMust": "Pas d'incontournable",
   "w.startAt": "départ : {room}",
-  "w.thanks": "Merci ! Je prévois environ {min} minutes, marche comprise. Tout reste modifiable.",
+  "w.thanks": "Merci ! Je prévois environ {time}, marche comprise. Tout reste modifiable.",
   "w.plan": "Préparer ma visite",
   "w.replan": "Replanifier ma visite",
   "w.planningBtn": "Préparation…",
@@ -1347,7 +1367,7 @@ const fr: Dict = {
   "src.demo": "Réponse démo · par règles, sans IA",
   "src.fallback": "Réponse démo · IA indisponible",
 
-  "t.h1": "Visite et plan",
+  "t.h1": "Votre visite",
   "t.progress": "{seen} vus · {togo} restants",
   "t.skippedN": " · {n} passés",
   "t.used": "Environ {n} min utilisées (prévues)",
@@ -1488,4 +1508,13 @@ export function renderWhy(lang: Lang, w: Why): string {
   if (w.liked.length) parts.push(translate(lang, "why.liked", { tags: tagList(lang, w.liked) }));
   if (w.filler) parts.push(translate(lang, `why.${w.filler}`));
   return parts.join(" ");
+}
+
+/** A visit length in hours for the preferences chat: "½ hour", "1 hour", "2.5 hours". */
+export function hoursText(lang: Lang, minutes: number): string {
+  if (minutes === 30) return translate(lang, "w.halfHour");
+  if (minutes === 60) return translate(lang, "w.hour1");
+  const h = Math.round((minutes / 60) * 100) / 100;
+  const n = h.toLocaleString(LANGS.find((l) => l.id === lang)?.htmlLang ?? "en", { maximumFractionDigits: 2 });
+  return translate(lang, "w.hours", { n });
 }
