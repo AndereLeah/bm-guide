@@ -217,7 +217,7 @@ export function detailFeedback(s: VisitState, delta: 1 | -1): VisitState {
 }
 
 export function setRemainingMinutes(s: VisitState, minutes: number): VisitState {
-  const m = Math.max(0, Math.min(480, Math.round(minutes)));
+  const m = Math.max(0, Math.min(620, Math.round(minutes)));
   if (m === s.remainingMinutes) return s;
   const up = m > s.remainingMinutes;
   return replan(

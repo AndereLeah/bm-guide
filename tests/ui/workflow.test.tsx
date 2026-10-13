@@ -73,6 +73,21 @@ describe("full visitor workflow (demo mode, no credentials)", () => {
     snapshot("00-front");
   });
 
+  it("0b. typing a long custom time keeps every digit (420 is not cut to 42)", async () => {
+    mount(<WelcomePage />, "/plan");
+    const box = await screen.findByRole("spinbutton", { name: "Custom time in minutes" });
+    for (const v of ["4", "42", "420"]) fireEvent.change(box, { target: { value: v } });
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    expect(await screen.findByText(/420 minutes, starting/)).toBeTruthy();
+    cleanup();
+    mount(<WelcomePage />, "/plan");
+    const box2 = await screen.findByRole("spinbutton", { name: "Custom time in minutes" });
+    fireEvent.change(box2, { target: { value: "900" } });
+    expect(screen.getByText(/Capped at 620 min/)).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    expect(await screen.findByText(/620 minutes, starting/)).toBeTruthy();
+  });
+
   it("1. preferences chat → plan my visit", async () => {
     mount(<WelcomePage />, "/plan");
     expect(await screen.findByText(/how much time do you have/i)).toBeTruthy();

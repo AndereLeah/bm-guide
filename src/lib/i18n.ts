@@ -20,6 +20,8 @@ export function langName(l: Lang): string {
 type Dict = Record<string, string>;
 
 const en: Dict = {
+  "warn.closing": "The galleries clear at {time}, so only about {usable} of your {budget} min can be used from this start time.",
+  "w.customMax": "Capped at {max} min — the longest the Museum is open in a day.",
   "g.liveFailed": "Live AI took too long, so this is the demo explanation.",
   "warn.underfilled": "Your plan uses about {total} of your {budget} min — that's everything in this guide that can be fitted in. Enjoy the extra {spare} min exploring.",
   "home.aria": "Museum Companion — front page",
@@ -372,6 +374,8 @@ const en: Dict = {
 };
 
 const zh: Dict = {
+  "warn.closing": "展厅在 {time} 清场，按此开始时间，{budget} 分钟中只能用上约 {usable} 分钟。",
+  "w.customMax": "最多 {max} 分钟——博物馆单日最长开放时间。",
   "g.liveFailed": "AI 响应超时，这里显示的是演示讲解。",
   "warn.underfilled": "行程约需 {total} 分钟（共 {budget} 分钟）——本导览中能安排的展品都已包含。剩余的 {spare} 分钟可以自由探索。",
   "home.aria": "博物馆导览伴侣 — 首页",
@@ -724,6 +728,8 @@ const zh: Dict = {
 };
 
 const es: Dict = {
+  "warn.closing": "Las salas se desalojan a las {time}, así que desde esta hora solo se pueden usar unos {usable} de tus {budget} min.",
+  "w.customMax": "Máximo {max} min: el horario más largo del Museo en un día.",
   "g.liveFailed": "La IA tardó demasiado; esta es la explicación de demo.",
   "warn.underfilled": "Tu plan usa unos {total} de tus {budget} min: es todo lo que esta guía puede incluir. Disfruta de los {spare} min extra explorando.",
   "home.aria": "Museum Companion — portada",
@@ -1076,6 +1082,8 @@ const es: Dict = {
 };
 
 const fr: Dict = {
+  "warn.closing": "Les salles sont évacuées à {time} : depuis cette heure de départ, seules environ {usable} de vos {budget} min sont utilisables.",
+  "w.customMax": "Limité à {max} min, la plus longue ouverture du Musée en une journée.",
   "g.liveFailed": "L’IA a mis trop de temps ; voici l’explication de démo.",
   "warn.underfilled": "Votre plan utilise environ {total} de vos {budget} min : c’est tout ce que ce guide peut inclure. Profitez des {spare} min restantes pour explorer.",
   "home.aria": "Museum Companion — accueil",

@@ -1,6 +1,6 @@
 import { ON_DISPLAY, OBJECTS_BY_ID } from "@/data/objects";
 import { ROOMS, ROOM_IDS } from "@/data/rooms";
-import { parseLocal, roomClosedOnDate, roomOpenAt, toHHMM } from "./availability";
+import { museumHours, parseLocal, roomClosedOnDate, roomOpenAt, toHHMM } from "./availability";
 import { shortestRoute, travelBetween } from "./routing";
 import { TAG_LABEL } from "./tags";
 import type { Code, DetailLevel, FeedbackState, MuseumObject, PlanResult, Preferences, RoomId, Stop, TagId, Why } from "./types";
@@ -227,7 +227,18 @@ function finalize(order: string[], ctx: Ctx, notes: Notes, excluded: { objectId:
     );
   }
   const spare = ctx.budget - ev.total;
-  if (stops.length && spare >= 15) {
+  // If the visit would run past the time the galleries are cleared, say so instead of "the guide ran out".
+  const clearAt = museumHours(ctx.visit.weekday).close;
+  const usable = Math.max(0, clearAt - ctx.visit.clock0);
+  const closingLimited = ctx.budget > usable + 5;
+  if (closingLimited) {
+    notes.add(
+      `The galleries clear at ${toHHMM(clearAt)}, so only about ${usable} of your ${ctx.budget} min can be used from this start time.`,
+      "warn.closing",
+      { time: toHHMM(clearAt), usable, budget: ctx.budget },
+    );
+  }
+  if (stops.length && spare >= 15 && !(closingLimited && usable - ev.total < 15)) {
     notes.add(
       `Your plan uses about ${ev.total} of your ${ctx.budget} min — that's everything in this guide that can be fitted in. Enjoy the extra ${spare} min exploring.`,
       "warn.underfilled",

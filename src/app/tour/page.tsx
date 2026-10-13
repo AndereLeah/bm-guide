@@ -96,7 +96,7 @@ export default function TourPage() {
                   type="number"
                   inputMode="numeric"
                   min={0}
-                  max={480}
+                  max={620}
                   value={timeInput}
                   onChange={(e) => setTimeInput(e.target.value)}
                   className="min-h-10 w-16 rounded-lg border border-line px-2 text-center"

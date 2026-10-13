@@ -57,6 +57,15 @@ describe("timing and budget", () => {
     expect(p.notes.some((n) => n.k === "warn.underfilled")).toBe(true);
   });
 
+  it("uses a long budget fully and explains when closing time cuts it short", () => {
+    const full = planTour({ prefs: prefs({ minutes: 420, interests: ["egypt", "animals"], visitStart: "2026-10-13T10:00" }) });
+    expect(full.totalMinutes).toBeGreaterThanOrEqual(380);
+    const late = planTour({ prefs: prefs({ minutes: 420, interests: ["egypt"], visitStart: "2026-10-13T14:00" }) });
+    expect(late.totalMinutes).toBeLessThanOrEqual(170);
+    expect(late.notes.some((n) => n.k === "warn.closing")).toBe(true);
+    expect(late.notes.some((n) => n.k === "warn.underfilled")).toBe(false);
+  });
+
   it("uses more of a bigger budget", () => {
     const short = planTour({ prefs: prefs({ minutes: 30, interests: ["animals"] }) });
     const long = planTour({ prefs: prefs({ minutes: 120, interests: ["animals"] }) });

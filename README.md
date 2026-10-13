@@ -64,7 +64,7 @@ Other providers also work: `ANTHROPIC_API_KEY` or any OpenAI-compatible `OPENAI_
 | Command | What it does |
 |---|---|
 | `npm run dev` | Start the app locally |
-| `npm test` | Run the 99 automated tests |
+| `npm test` | Run the 101 automated tests |
 | `npm run typecheck` | TypeScript check |
 | `npm run build` / `npm start` | Production build / server |
 | `npm run check:ai` | Verify the AI key and model (never prints the key) |

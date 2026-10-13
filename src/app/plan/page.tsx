@@ -12,6 +12,8 @@ import { TAGS } from "@/lib/tags";
 import type { GuideStyle, Preferences, RoomId, TagId } from "@/lib/types";
 import { createVisit } from "@/lib/visit";
 
+/** Longest possible visit: a Friday late opening, 10.00 to 20.20. */
+const MAX_MINUTES = 620;
 const TIMES = [30, 45, 60, 90, 120];
 const STYLES: GuideStyle[] = ["approachable", "in-depth", "playful", "family"];
 const LOCALE = { en: "en-GB", zh: "zh-CN", es: "es-ES", fr: "fr-FR" } as const;
@@ -247,18 +249,20 @@ export default function WelcomePage() {
                 type="number"
                 inputMode="numeric"
                 min={10}
-                max={300}
+                max={MAX_MINUTES}
                 value={customTime}
                 onChange={(e) => {
                   setCustomTime(e.target.value);
                   const n = parseInt(e.target.value, 10);
-                  if (n >= 10 && n <= 300) setMinutes(n);
+                  // Every keystroke updates the plan length, so "420" never gets stuck at "42".
+                  if (n >= 10) setMinutes(Math.min(n, MAX_MINUTES));
                 }}
                 className="min-h-11 w-24 rounded-lg border border-line px-3"
                 aria-label={t("w.customAria")}
               />
               {t("w.minutes")}
             </label>
+            {parseInt(customTime, 10) > MAX_MINUTES && <p className="text-xs text-warn">{t("w.customMax", { max: MAX_MINUTES })}</p>}
             <div className="text-sm">
               <span className="text-muted">{t("w.starting")} </span>
               {editStart ? (
